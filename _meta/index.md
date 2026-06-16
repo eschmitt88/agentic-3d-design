@@ -26,11 +26,17 @@ and `/new-experiment`.
 
 ## Proposals
 
-- `experiments/_proposals/2026-06-16-snap-fit-enclosure.md` — first trial loop
+- `experiments/_proposals/_done/2026-06-16-snap-fit-enclosure.md` — first trial loop (implemented)
 
 ## Active experiments
 
-(none yet — snap-fit-enclosure proposal awaiting `/implement`)
+(none)
+
+## Completed experiments
+
+- [[2026-06-16-snap-fit-enclosure]] — two-part snap-fit enclosure via
+  build123d in a closed verify-revise loop; all 8 DFM/strength gates pass
+  in 4 cycles (strength = closed-form cantilever; CalculiX absent on host).
 
 ## Open questions
 

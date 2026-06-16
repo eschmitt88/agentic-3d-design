@@ -1,0 +1,50 @@
+# 2026-06-16-snap-fit-enclosure — design parameters, material constants,
+# and gate thresholds. All lengths in mm, angles in degrees.
+#
+# `params` below is the CONVERGED, all-pass parameter set (cycle 5 output
+# of the verify-revise loop). The harness (run.py) starts from a
+# deliberately-wrong seed set (defined in run.py: START_PARAMS) and walks
+# parameters toward this target one fix per cycle, logging each cycle's
+# failures->fixes to log.md. The single run is seed 42.
+
+seed: 42
+
+params:
+  # outer envelope
+  outer_L: 60.0          # box outer length (x)
+  outer_W: 40.0          # box outer width  (y)
+  outer_H: 25.0          # box outer height (z)
+  wall_t: 2.0            # side wall thickness
+  floor_t: 2.0          # box floor thickness
+  lid_t: 2.0            # lid top-plate thickness
+
+  # mating lip
+  clearance: 0.20       # radial gap, lid lip <-> box cavity inner (per side)
+  lip_depth: 6.0        # how far the lip skirt descends into the cavity
+  lip_t: 1.6            # lip wall thickness
+
+  # cantilever snap arms
+  snap_count: 4              # total arms (split across the two long walls)
+  snap_arm_length: 12.0      # cantilever free length L_arm
+  snap_arm_thickness: 1.6    # arm thickness t_arm (flex direction)
+  snap_arm_width: 8.0        # arm width (along wall)
+  snap_hook_depth: 0.8       # hook protrusion / engagement interference delta
+  snap_hook_height: 2.0      # hook vertical extent
+  snap_lead_in_deg: 45.0     # hook insertion-ramp angle (<=45 -> support-free)
+  slot_height: 3.0           # vertical extent of the mating slot in the rim
+
+# PETG material (snap-arm strength gate)
+material:
+  name: PETG
+  youngs_modulus_MPa: 2100.0     # E ~ 2.1 GPa
+  yield_strain: 0.04             # ~4% yield strain
+
+# Pass-gate thresholds (booleans/numbers checked by run.py)
+gates:
+  clearance_min: 0.15
+  clearance_max: 0.25
+  min_wall_min: 1.5
+  max_overhang_deg: 45.0
+  interference_tol_mm3: 0.001    # bad-interference volume must be ~0
+  strain_margin_min: 1.5         # yield_strain / peak_strain must exceed this
+  max_revise_cycles: 5

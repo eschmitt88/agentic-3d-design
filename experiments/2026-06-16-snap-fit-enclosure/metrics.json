@@ -1,0 +1,83 @@
+{
+  "seed": 42,
+  "converged": true,
+  "cycles_to_first_all_pass": 4,
+  "max_revise_cycles_budget": 5,
+  "all_gates_pass": true,
+  "gate_results": {
+    "box_valid": true,
+    "lid_valid": true,
+    "clearance_in_band": true,
+    "min_wall_ok": true,
+    "overhang_ok": true,
+    "no_interference": true,
+    "snap_reachable": true,
+    "strength_ok": true
+  },
+  "final_numbers": {
+    "clearance_radial_mm": 0.2,
+    "min_wall_mm": 1.6,
+    "max_overhang_deg": 45.0,
+    "interference_volume_mm3": 0.0,
+    "snap_hook_depth_mm": 0.8,
+    "snap_peak_strain": 0.013333,
+    "strain_margin": 3.0,
+    "box_volume_mm3": 13416.0,
+    "lid_volume_mm3": 6848.0
+  },
+  "final_params": {
+    "outer_L": 60.0,
+    "outer_W": 40.0,
+    "outer_H": 25.0,
+    "wall_t": 2.0,
+    "floor_t": 2.0,
+    "lid_t": 2.0,
+    "clearance": 0.2,
+    "lip_depth": 6.0,
+    "lip_t": 1.6,
+    "snap_count": 4,
+    "snap_arm_length": 12.0,
+    "snap_arm_thickness": 1.6,
+    "snap_arm_width": 8.0,
+    "snap_hook_depth": 0.8,
+    "snap_hook_height": 2.0,
+    "snap_lead_in_deg": 45.0,
+    "slot_height": 3.0
+  },
+  "strength_method": "closed_form_cantilever",
+  "strength_note": "CalculiX/FreeCAD/gmsh absent on host; used eps=3*t*delta/(2*L^2) per proposal fallback.",
+  "process": {
+    "n_revise_cycles": 4,
+    "failures_caught_by_loop": 10,
+    "failure_taxonomy": {
+      "clearance_in_band": 2,
+      "min_wall_ok": 1,
+      "overhang_ok": 3,
+      "strength_ok": 4
+    },
+    "failures_left_to_human": 0
+  },
+  "artifacts": {
+    "box_step": "results/box.step",
+    "box_stl": "results/box.stl",
+    "lid_step": "results/lid.step",
+    "lid_stl": "results/lid.stl",
+    "assembled_step": "results/assembled_closed.step",
+    "exploded_step": "results/assembled_exploded.step",
+    "three_view_png": "results/three_view.png"
+  },
+  "material": {
+    "name": "PETG",
+    "youngs_modulus_MPa": 2100.0,
+    "yield_strain": 0.04
+  },
+  "gate_thresholds": {
+    "clearance_min": 0.15,
+    "clearance_max": 0.25,
+    "min_wall_min": 1.5,
+    "max_overhang_deg": 45.0,
+    "interference_tol_mm3": 0.001,
+    "strain_margin_min": 1.5,
+    "max_revise_cycles": 5
+  }
+}
