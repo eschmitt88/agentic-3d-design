@@ -3,6 +3,7 @@ kind: proposal
 slug: 2026-06-16-snap-fit-enclosure
 date: "2026-06-16"
 status: implemented
+experiment: experiments/2026-06-16-snap-fit-enclosure/
 hypothesis: >
   A build123d-writing LLM agent, given a closed verification loop (OCCT
   validity + DFM diagnostics + rendered-PNG review, and a CalculiX strength

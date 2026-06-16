@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-06-16T20:50:41Z",
+  "session_id": "a401b75c-1e8e-401a-a0b8-3a40c2c8419d",
+  "input_tokens": 17485,
+  "output_tokens": 66989,
+  "cache_read_tokens": 4990231,
+  "cache_creation_tokens": 183873,
+  "tools_used_summary": {
+    "AskUserQuestion": 2,
+    "Skill": 2,
+    "Workflow": 1,
+    "Bash": 15,
+    "Read": 6,
+    "Edit": 6,
+    "Write": 9
+  }
+}
