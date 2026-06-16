@@ -1,0 +1,312 @@
+{
+  "summary": "Deep research harness — fan-out web searches, fetch sources, adversarially verify claims, synthesize a cited report.",
+  "agentCount": 106,
+  "logs": [
+    "Q: State of the art (as of mid-2026) in agentic 3D/CAD design for medium-complexity…",
+    "Decomposed into 5 angles: agent-driven code-CAD tractability, CAD MCP servers and agent frameworks, generative 3D for mechanical parts, DFM, materials, FDM strength and open-source FEA, print outsourcing and entry FDM printer",
+    "print outsourcing and entry FDM printer: 6 results",
+    "agent-driven code-CAD tractability: 6 results",
+    "generative 3D for mechanical parts: 6 results",
+    "generative 3D for mechanical parts: 3 novel (3 filtered)",
+    "DFM, materials, FDM strength and open-source FEA: 6 results",
+    "DFM, materials, FDM strength and open-source FEA: 5 novel (1 filtered)",
+    "CAD MCP servers and agent frameworks: 6 results",
+    "CAD MCP servers and agent frameworks: 4 novel (2 filtered)",
+    "Fetched 24 sources → 109 claims → verifying top 25",
+    "\"The tool's design thesis is that existing code-CAD…\": 3-0 ✓",
+    "\"cad-khana is a CLI tool and Claude Code skill that…\": 3-0 ✓",
+    "\"Current LLMs (general and domain-specific) succeed…\": 3-0 ✓",
+    "\"Generating CadQuery Python code directly from text…\": 3-0 ✓",
+    "\"CADSmith is a multi-agent system that generates Ca…\": 3-0 ✓",
+    "\"Because CadQuery is Python, LLMs are well-suited t…\": 0-3 ✗",
+    "\"cad-khana's diagnostics.json provides machine-chec…\": 3-0 ✓",
+    "\"Programmatic geometric validation runs OpenCASCADE…\": 3-0 ✓",
+    "\"CAD-Judge introduces a compiler-based verifiable r…\": 3-0 ✓",
+    "\"The paper motivates a compiler/grammar-based verif…\": 3-0 ✓",
+    "\"Closed-loop refinement with programmatic geometric…\": 3-0 ✓",
+    "\"The server enables self-verification of geometry b…\": 3-0 ✓",
+    "\"An MCP server (build123d-mcp) exists that gives an…\": 3-0 ✓",
+    "\"The server supports STEP/STL export and import plu…\": 3-0 ✓",
+    "\"CAD-Coder generates parametric CAD as CadQuery (Py…\": 3-0 ✓",
+    "\"Even state-of-the-art text-to-CAD generation in 20…\": 3-0 ✓",
+    "\"Existing text-to-CAD systems focus primarily on si…\": 3-0 ✓",
+    "\"CAD-Coder substantially outperforms Text2CAD and u…\": 2-1 ✓",
+    "\"An LLM agent can drive a closed-loop self-improvin…\": 3-0 ✓",
+    "\"On MUSE, current LLM/text-to-CAD models exhibit a …\": 3-0 ✓",
+    "\"The agent loop uses CadQuery Python as the executa…\": 3-0 ✓",
+    "\"Even strong frontier models almost entirely fail s…\": 3-0 ✓",
+    "\"Iterative FEA feedback measurably improves enginee…\": 3-0 ✓",
+    "\"Increasing infill percentage produces the largest …\": 3-0 ✓",
+    "\"Higher infill raises UTS by roughly 24-37% (PLA +3…\": 2-1 ✓",
+    "Verify done: 25 claims → 24 confirmed, 1 killed"
+  ],
+  "result": {
+    "question": "State of the art (as of mid-2026) in agentic 3D/CAD design for medium-complexity, multi-part mechanical designs, aimed at a Python-fluent researcher with NO printer yet (will outsource prints or buy one). Adjudicate the CAD-tooling choice with evidence; don't pre-commit. Cover:\n\n1. AGENT-DRIVEN CAD (LLM writes/drives CAD): code-CAD options — CadQuery, build123d, OpenSCAD, and any newer code-CAD DSLs; GUI-with-scripting — FreeCAD Python API/MCP; commercial-cloud APIs — Onshape FeatureScript/API, Fusion 360 Python API. Which are most tractable for an LLM agent loop today? Evidence: benchmarks, papers, GitHub projects, MCP servers for CAD, known agent frameworks producing parametric CAD. Token/error characteristics, determinism, parametricity, git-friendliness, ability to self-verify geometry (export STEP/STL, run checks, render images for visual feedback).\n\n2. GENERATIVE 3D models: current text-to-CAD / image-to-3D / text-to-3D-mesh (e.g. Text2CAD, CAD-Coder, mesh generators, Zoo/Text-to-CAD, Hunyuan3D, TRELLIS, point/sdf/B-rep generative models). For MULTI-PART MECHANICAL designs with real manufacturability constraints — how usable vs. agent-driven code-CAD? Strengths/limits. Does the field favor generative or agent-CAD for engineering parts in 2026?\n\n3. CAD software recommendation for a hobbyist budget (open-source or lowish fee): FreeCAD, OpenSCAD, CadQuery/build123d, Onshape free/hobbyist, Fusion 360 personal. Trade-offs for an agentic workflow specifically.\n\n4. MANUFACTURABILITY / MATERIALS / STRENGTH: how to bring DFM, material selection (FDM filaments PLA/PETG/ABS/ASA/nylon/CF-composites; resin), and strength/robustness (anisotropy of FDM layers, infill, wall count, FEA/simulation options open-source like CalculiX/FreeCAD FEM) into an agentic loop. Tools an agent can call to check manufacturability and estimate strength.\n\n5. PRINT SERVICES / BUYING: since user has no printer — reputable outsourcing services (JLCPCB 3D, Craftcloud, PCBWay, Shapeways/etc.), and what entry FDM printer to consider if buying (e.g. Bambu Lab class) for functional multi-part prototypes.\n\n6. TRIAL TOPIC: recommend 2-3 concrete medium-but-simple multi-part trial designs suitable for a first agentic-CAD test that is single-or-few-part and printable, with a clear success metric (e.g. parametric enclosure with snap-fit lid; a two-part bearing/bracket; a parametric hinged box). Pick a best first trial.\n\nDeliver an evidence-cited report with a clear bottom-line recommendation for the CAD/agent stack and a recommended first trial.",
+    "summary": "As of mid-2026, the evidence strongly favors agent-driven code-CAD over generative text-to-CAD/mesh models for medium-complexity, multi-part mechanical designs. Across many primary papers (CADSmith, CAD-Coder, Text-to-CadQuery, Self-Improving-CAD-with-FEA) and tooling repos (cad-khana, build123d-mcp), the convergent stack is: an LLM writing CadQuery or build123d Python in a closed loop, exporting STEP/STL, and self-verifying via programmatic OCCT/OpenCASCADE geometry checks, rendered images, and even CalculiX FEA — a loop that demonstrably and substantially beats single-pass generation (e.g. CADSmith mean Chamfer Distance 28.37→0.74; FEA loop requirement-pass 38.8%→60.5%). Generative text-to-3D and text-to-CAD remain single-part-biased and degrade sharply on complex topology and multi-part assemblies due to spatial misalignment; dedicated multi-part benchmarks (MUSE, Text2CAD-Bench, Hephaestus-CCX) show a \"failure cascade\" where even frontier models almost never satisfy strict engineering requirements. Net: the field favors agent/code-CAD (CadQuery/build123d) for engineering parts, but absolute success on strict manufacturable multi-part designs is still far from solved, so the recommended workflow is a human-curated agentic code-CAD loop with structured geometric and DFM feedback. The verified evidence base is deep on the agent-CAD-vs-generative adjudication (Sections 1-2-4) and on FDM strength tradeoffs, but is thin/absent on several practical sub-questions (specific commercial-API tractability, hobbyist CAD-software pricing trade-offs, print-service vendors, printer recommendations, and concrete trial designs) — those should be treated as not yet evidence-backed here.",
+    "findings": [
+      {
+        "claim": "The field favors agent-driven code-CAD (CadQuery/build123d Python) over generative text-to-CAD/mesh for medium-complexity multi-part mechanical parts, because Python code-CAD leverages LLMs' existing Python+spatial-reasoning strengths, avoids task-specific command sequences, and enables direct geometric validation and LLM integration.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/pdf/2505.06507",
+          "https://arxiv.org/html/2505.19713",
+          "https://arxiv.org/html/2603.26512"
+        ],
+        "evidence": "Text-to-CadQuery (2505.06507) argues generating CadQuery directly works because pretrained LLMs already excel at Python generation and spatial reasoning, avoiding intermediate command sequences that require training from scratch. CAD-Coder (2505.19713) independently chooses CadQuery for 'direct geometric validation, a richer modeling vocabulary, and seamless integration with existing LLMs,' contrasting it with command-sequences and meshes. CADSmith (2603.26512) is a multi-agent pipeline generating CadQuery from NL and exporting STEP/STL. Convergent choice of CadQuery/build123d Python across multiple 2025-2026 primary papers. (Note: a narrower phrasing claiming fine-tuning is 'highly effective' was refuted 0-3, so confine the claim to the architectural rationale, not fine-tuning efficacy.)",
+        "vote": "3-0 across constituent claims [4],[5],[13]"
+      },
+      {
+        "claim": "A closed-loop agent that writes code-CAD, exports geometry, and self-verifies with programmatic geometric feedback substantially outperforms single-pass generation.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/html/2603.26512",
+          "https://arxiv.org/html/2605.17448v2"
+        ],
+        "evidence": "CADSmith (2603.26512, CMU) reports closed-loop refinement raises CadQuery execution rate to 100% and cuts mean Chamfer Distance from 28.37 (zero-shot) to 0.74 (full system with vision Judge); median F1 0.9707→0.9846, IoU 0.8085→0.9629. The Self-Improving FEA paper (2605.17448v2) shows iterative feedback raises mean requirement pass from 38.8% to 60.5% (GPT-5.5/high, 10 attempts, 9/50 strict passes, ~68 min/item) and Box-IoU 0.444→0.592. Two independent primary sources confirm the loop-beats-single-pass result. Caveat: CADSmith's 28.37 zero-shot mean is partly inflated by a few catastrophic outliers (paper's own admission), but the directional conclusion holds across all four metrics.",
+        "vote": "3-0 across constituent claims [6],[21]"
+      },
+      {
+        "claim": "Agents can self-verify exported geometry with concrete machine-checkable checks: OCCT/OpenCASCADE kernel queries (volume, bounding box, center of mass, face/edge/vertex counts, solid validity/watertightness), interference/clearance/wall-thickness/overhang diagnostics, rendered engineering-drawing/PNG images for visual feedback, and STEP/STL export — with assertion violations forced into build failures.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/html/2603.26512",
+          "https://github.com/cyberchitta/cad-khana",
+          "https://github.com/pzfreo/build123d-mcp"
+        ],
+        "evidence": "CADSmith's Executor runs a hard OCCT kernel check: 'if the solid is not valid (not watertight), the iteration fails regardless,' extracting volume, bbox, center of mass, face/edge/vertex counts, validity. cad-khana wraps build123d, runs `khana build` to export STL/STEP and emit diagnostics.json reporting interferences, clearances, wall thickness, overhangs; assertions (e.g. .assert_no_interference, .assert_clearance(min_mm=0.2), .assert_min_wall(min_mm=1.5)) become build failures. build123d-mcp exposes measure() (volume, area, topology, bbox, centre of mass, inertia tensor), analyze_printability (overhang/thin-wall), import/export STEP/STL/DXF/SVG, and render_view() to PNG/SVG/DXF — explicitly to fix that 'the AI writes blind.' Three primary sources (one paper + two tool repos) corroborate the self-verification toolchain.",
+        "vote": "3-0 across constituent claims [1],[2],[3],[7],[10],[11],[12]"
+      },
+      {
+        "claim": "Code-CAD agent tooling purpose-built for LLM loops now exists (cad-khana, build123d-mcp), grounded in the design thesis that existing code-CAD tools assume a human at a render window and agents instead need explicit non-visual feedback: scalar JSON diagnostics plus rendered engineering drawings.",
+        "confidence": "high",
+        "sources": [
+          "https://github.com/cyberchitta/cad-khana",
+          "https://github.com/pzfreo/build123d-mcp"
+        ],
+        "evidence": "cad-khana is a CLI tool and Claude Code skill wrapping build123d for 'diagnostics-first' LLM iteration; its README states existing tools (OpenSCAD, CadQuery, build123d) 'assume a human with a render window' and that 'LLMs can reason about CAD geometry from code but need explicit feedback on the things a human would catch visually,' supplying both diagnostics.json and `khana draw` engineering-drawing PNGs. build123d-mcp is an MCP server exposing render/measure/printability/export tools, motivated by 'the AI writes blind.' Both are primary repos and ecosystem-recognized (build123d-mcp indexed on Glama/mcpmarket/Snyk). Caveat: cad-khana self-describes as 'early. API may still churn' — these are emerging single-project tools, not an established standard.",
+        "vote": "3-0 across constituent claims [1],[2],[10]"
+      },
+      {
+        "claim": "An LLM agent can drive a closed-loop CAD pipeline that includes open-source FEA simulation feedback (CalculiX) to validate engineering constraints (yielding/von Mises stress, deflection, buckling), giving an agentic path to bring strength/manufacturability checks into the loop.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/html/2605.17448v2"
+        ],
+        "evidence": "Self-Improving CAD Generation Agents with FEA as Feedback (2605.17448v2, May 2026): agent writes CadQuery, exports STEP (ISO 10303 AP242), then the Hephaestus-CCX harness meshes and runs CalculiX (free open-source, Abaqus-deck-compatible) returning typed failures over stress (*STATIC von Mises ≤ limit), displacement (≤25mm), modal, buckling (*BUCKLE first-mode factor ≥1.5), contact, clearance. Demonstrates a concrete, callable open-source FEA loop. Single primary source but detailed and methodologically explicit; corroborated in pattern by EngiAI (2605.19743) and EngDesign (2509.16204) on engineering-CAD difficulty.",
+        "vote": "3-0 across constituent claims [18],[19]"
+      },
+      {
+        "claim": "Generative text-to-CAD/text-to-3D is single-part-biased and degrades sharply on complex topology and multi-part assemblies (spatial misalignment/dislocations), making it less usable than agent code-CAD for manufacturable multi-part mechanical parts in 2026.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/abs/2605.18430",
+          "https://arxiv.org/html/2505.19713",
+          "https://arxiv.org/abs/2605.28579"
+        ],
+        "evidence": "Text2CAD-Bench (2605.18430, 600 examples, 7 frontier LLMs): basic geometry OK but complex topology/advanced features degrade — L3 invalidity ~68-70%, IoU ~0.23-0.25; L4 real-world 61-81% invalid. CAD-Coder (2505.19713) Appendix F: 'still struggles with complex structures composed of multiple sub-components, where inaccurate spatial alignment between modules can lead to visible dislocations.' MUSE (2605.28579) was built because prior text-to-CAD 'focus primarily on generating single-part CAD models' with geometric-similarity metrics that miss functionality/manufacturability/assemblability. Multiple primary 2026 sources converge; later works (ArtiCAD, OBJ2CAD, ToolCAD) explicitly motivate themselves by this limitation. Note: this is a 2025-generation limitation actively being addressed by code-CAD/multi-agent methods, not a permanent ceiling.",
+        "vote": "3-0 across constituent claims [0],[15],[16]"
+      },
+      {
+        "claim": "On dedicated multi-part/engineering benchmarks, even frontier models exhibit a failure cascade (executable code → valid geometry → engineering-ready design) and almost entirely fail STRICT engineering requirements, so agentic code-CAD for manufacturable mechanical parts is far from solved as of mid-2026.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/abs/2605.28579",
+          "https://arxiv.org/html/2605.17448v2"
+        ],
+        "evidence": "MUSE (2605.28579): 'clear failure cascade from executable code to valid geometry and finally to engineering-ready design, with even the strongest models achieving limited success on fine-grained engineering criteria'; GPT-5.5 only ~54.72% functionality / ~53.77% manufacturability, code-exec ~77% degrading to design-intent ~67%. Hephaestus-CCX (2605.17448v2): '400 first attempts do not produce a single strict-passing artifact, and one FEA-feedback round adds only one strict pass across another 400 revised submissions'; first-attempt mean requirement pass only ~20-33% single-part / 6.6-15% multi-part. Two primary 2026 benchmarks agree; corroborated by EngiAI/EngDesign. This tempers the agent-CAD recommendation: best as a human-curated assistant, not autonomous part production.",
+        "vote": "3-0 across constituent claims [17],[20]"
+      },
+      {
+        "claim": "Quantified FDM strength tradeoffs exist that an agent can encode: raising infill percentage gives the largest ultimate tensile strength (UTS) gains (PLA +37.27%, PET-G +24.42%) but reduces specific (mass-normalized) tensile strength (~30.41% PLA, ~37.69% PET-G), so strength-optimal and strength-to-weight-optimal parameters do not coincide.",
+        "confidence": "high",
+        "sources": [
+          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9230522/"
+        ],
+        "evidence": "Peer-reviewed MDPI Polymers 2022 study (PMC9230522; 57 PLA + 57 PET-G specimens): variable infill percentage produced 'the biggest relative increase of ultimate tensile strength and the biggest relative decrease of specific tensile strength,' with figures PLA +37.27% UTS / -30.41% STS and PET-G +24.42% UTS / -37.69% STS; conclusion that parameters for max UTS do not overlap with optimal strength-to-weight ratio. Single but credible peer-reviewed primary source. Caveat: magnitudes are scoped to this study's infill range/pattern/orientation, not a universal law (claim hedges with 'roughly'); the UTS-vs-specific-strength inversion was one constituent vote 2-1 and broader infill/anisotropy/wall-count guidance beyond this one study is not separately verified here.",
+        "vote": "3-0 (tradeoff direction [22]); 2-1 (numeric magnitudes [23])"
+      },
+      {
+        "claim": "Compiler/grammar-based verification (CAD-Judge) is an emerging cheaper alternative to rendering+VLM review for grading and verifying LLM-generated CAD, using a Compiler-as-a-Judge reward signal in training and a Compiler-as-a-Review module at test time.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/pdf/2508.04002"
+        ],
+        "evidence": "CAD-Judge (2508.04002, Aug 2025) introduces CJM (fast direct reward using Chamfer Distance to ground truth, avoiding costly rendering/ranking) and CRM (efficient test-time verification), motivated explicitly that 'rendering CAD models can be slow, and deploying VLMs to review CAD models can be expensive and may introduce reward hacking.' Single primary source, descriptive of the paper's own method/rationale; relevant as an alternative verification primitive for the agent loop alongside the OCCT/render/FEA checks above.",
+        "vote": "3-0 across constituent claims [8],[9]"
+      }
+    ],
+    "caveats": "Scope/coverage: The verified evidence base deeply supports the central adjudication (agent code-CAD vs generative, Sections 1, 2, and the agentic-strength/FEA part of Section 4) and one peer-reviewed FDM strength result. It does NOT contain verified claims for several parts of the original question: (1) commercial-cloud API tractability (Onshape FeatureScript/API, Fusion 360 Python API) for LLM loops — no verified evidence; (2) Section 3 hobbyist CAD-software pricing/trade-offs (FreeCAD vs Onshape free vs Fusion 360 personal) — no verified evidence; (3) Section 5 print services (JLCPCB, Craftcloud, PCBWay, Shapeways) and entry FDM printer recommendations (Bambu Lab class) — no verified evidence; (4) Section 6 concrete trial designs and a 'best first trial' — no verified evidence; (5) broader DFM/material-selection and FEA-tooling-beyond-CalculiX, and anisotropy/infill/wall-count guidance beyond the single PMC9230522 study. Treat those as un-researched here, not as negative findings. Source quality: claims rest heavily on primary arXiv preprints (many mid-2026, e.g. 2603.26512, 2605.17448v2, 2605.28579, 2605.18430) and two tool repos (cad-khana, build123d-mcp); the strongest benchmark numbers are author-self-reported single benchmarks without independent replication. Time-sensitivity: this is a fast-moving field — tooling (cad-khana self-describes 'early, API may churn') and SOTA benchmark numbers will shift; the multi-part/spatial-misalignment limitation is explicitly being actively mitigated, so the 'generative loses' verdict is current-state, not permanent. One constituent claim (fine-tuning Text-to-CadQuery being 'highly effective') was refuted 0-3 and excluded; the architectural rationale for CadQuery was retained. Numeric-magnitude FDM claim [23] passed only 2-1.",
+    "openQuestions": [
+      "How tractable are commercial-cloud CAD APIs (Onshape FeatureScript/API, Fusion 360 Python API) for an LLM agent loop relative to CadQuery/build123d, in token/error/determinism/git-friendliness terms? No verified evidence was gathered.",
+      "What is the concrete hobbyist CAD-software recommendation and trade-off ranking (FreeCAD Python/FEM, OpenSCAD, CadQuery/build123d, Onshape free, Fusion 360 personal) for an agentic workflow specifically? Not covered by verified claims.",
+      "Which print-outsourcing services and which entry FDM printer (e.g. Bambu Lab class) are appropriate for functional multi-part prototypes, given the user has no printer? Not researched.",
+      "What are 2-3 concrete medium-but-simple multi-part trial designs (e.g. parametric snap-fit enclosure, two-part bracket/bearing, hinged box) with clear success metrics, and which is the best first agentic-CAD trial? Not addressed by verified evidence.",
+      "Beyond CalculiX/FreeCAD FEM and OCCT geometry checks, what is the full callable DFM/manufacturability and material-selection toolchain an agent should invoke, and how well do infill/wall-count/anisotropy strength estimates generalize beyond the single PMC9230522 study?"
+    ],
+    "refuted": [
+      {
+        "claim": "Because CadQuery is Python, LLMs are well-suited to the task: they already excel at Python generation and spatial reasoning, and fine-tuning on Text-to-CadQuery data is highly effective.",
+        "vote": "0-3",
+        "source": "https://arxiv.org/pdf/2505.06507"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://arxiv.org/abs/2605.18430",
+        "quality": "primary",
+        "angle": "agent-driven code-CAD tractability",
+        "claimCount": 4
+      },
+      {
+        "url": "https://github.com/cyberchitta/cad-khana",
+        "quality": "primary",
+        "angle": "agent-driven code-CAD tractability",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2505.06507",
+        "quality": "primary",
+        "angle": "agent-driven code-CAD tractability",
+        "claimCount": 4
+      },
+      {
+        "url": "https://arxiv.org/html/2603.26512",
+        "quality": "primary",
+        "angle": "agent-driven code-CAD tractability",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2508.04002",
+        "quality": "primary",
+        "angle": "agent-driven code-CAD tractability",
+        "claimCount": 4
+      },
+      {
+        "url": "https://modelrift.com/blog/openscad-llm-benchmark/",
+        "quality": "blog",
+        "angle": "agent-driven code-CAD tractability",
+        "claimCount": 5
+      },
+      {
+        "url": "https://snyk.io/articles/9-mcp-servers-for-computer-aided-drafting-cad-with-ai/",
+        "quality": "blog",
+        "angle": "CAD MCP servers and agent frameworks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://github.com/Svetlana-DAO-LLC/cad-agent",
+        "quality": "blog",
+        "angle": "CAD MCP servers and agent frameworks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://github.com/pzfreo/build123d-mcp",
+        "quality": "primary",
+        "angle": "CAD MCP servers and agent frameworks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2505.19713",
+        "quality": "primary",
+        "angle": "CAD MCP servers and agent frameworks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/abs/2605.28579",
+        "quality": "primary",
+        "angle": "generative 3D for mechanical parts",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2605.17448v2",
+        "quality": "primary",
+        "angle": "generative 3D for mechanical parts",
+        "claimCount": 5
+      },
+      {
+        "url": "https://www.3daistudio.com/blog/pixal3d-vs-trellis-2-vs-hunyuan-3d-comparison",
+        "quality": "blog",
+        "angle": "generative 3D for mechanical parts",
+        "claimCount": 3
+      },
+      {
+        "url": "https://github.com/da-crivelli/freecad-parametric-fea",
+        "quality": "secondary",
+        "angle": "DFM, materials, FDM strength and open-source FEA",
+        "claimCount": 4
+      },
+      {
+        "url": "https://github.com/prusa3d/PrusaSlicer/wiki/Command-Line-Interface",
+        "quality": "primary",
+        "angle": "DFM, materials, FDM strength and open-source FEA",
+        "claimCount": 4
+      },
+      {
+        "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9230522/",
+        "quality": "primary",
+        "angle": "DFM, materials, FDM strength and open-source FEA",
+        "claimCount": 4
+      },
+      {
+        "url": "https://www.hubs.com/knowledge-base/how-design-parts-fdm-3d-printing/",
+        "quality": "secondary",
+        "angle": "DFM, materials, FDM strength and open-source FEA",
+        "claimCount": 5
+      },
+      {
+        "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12845617/",
+        "quality": "primary",
+        "angle": "DFM, materials, FDM strength and open-source FEA",
+        "claimCount": 4
+      },
+      {
+        "url": "https://fixthephoto.com/best-3d-printing-services.html",
+        "quality": "blog",
+        "angle": "print outsourcing and entry FDM printer",
+        "claimCount": 5
+      },
+      {
+        "url": "https://jlc3dp.com/3d-printing/multi-jet-fusion",
+        "quality": "primary",
+        "angle": "print outsourcing and entry FDM printer",
+        "claimCount": 5
+      },
+      {
+        "url": "https://blog.printpal.io/which-bambu-lab-printer-is-right-for-you-a-2026-buyers-guide/",
+        "quality": "blog",
+        "angle": "print outsourcing and entry FDM printer",
+        "claimCount": 5
+      },
+      {
+        "url": "https://3dprinteddecor.com/bambu-lab-3d-printer-review-2026/",
+        "quality": "blog",
+        "angle": "print outsourcing and entry FDM printer",
+        "claimCount": 4
+      },
+      {
+        "url": "https://www.digitmakers.ca/blogs/news/how-to-print-asa-and-abs-on-the-bambu-lab-p1s-or-x1c-without-warping",
+        "quality": "blog",
+        "angle": "print outsourcing and entry FDM printer",
+        "claimCount": 4
+      },
+      {
+        "url": "https://www.pcbway.com/rapid-prototyping/3d-printing/",
+        "quality": "primary",
+        "angle": "print outsourcing and entry FDM printer",
+        "claimCount": 5
+      }
+    ],
+    "stats": {
+      "angles": 5,
+      "sourcesFetched": 24,
+      "claimsExtracted": 109,
+      "claimsVerified": 25,
+      "confirmed": 24,
+      "killed": 1,
+      "afterSynthesis": 9,
+      "urlDupes": 3,
+      "budgetDropped": 3,
+      "agentCalls": 106
+    }
+  }
+}
