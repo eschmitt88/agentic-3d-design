@@ -5,7 +5,17 @@ principles; this file refines them for this project.
 
 ## What this project is about
 
-One or two sentences. Fill in when the project stops being exploratory.
+Can an LLM agent design medium-complexity, multi-part **mechanical** objects
+that are actually manufacturable — by writing parametric **code-CAD**
+(build123d / CadQuery, Python/OCCT) in a **closed verify-and-revise loop**?
+The loop exports geometry and self-checks: OCCT validity → DFM diagnostics
+(clearance, min-wall, overhang, interference) → rendered-PNG review →
+**CalculiX FEA** strength gate. Generative text-to-3D/mesh is on the bench
+(ideation only) — the verified mid-2026 evidence favors agent code-CAD for
+engineering parts. Strength/manufacturability are first-class. The FEA gate
+bridges to the sibling project `agentic-solid-mechanics`. `agency: max`.
+Orientation: `README.md`; landscape evidence:
+`literature/posts/2026-06-16-agentic-cad-landscape.md`.
 
 ## Layout (see user CLAUDE.md for the full rationale)
 
