@@ -1,0 +1,14 @@
+[Unit]
+Description=agentic-3d-design QA viewer (LAN + Tailscale, port 8091)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/projects/research/agentic-3d-design
+ExecStart=/usr/bin/python3 /mnt/projects/research/agentic-3d-design/tools/qa_serve.py --port 8091
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

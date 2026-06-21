@@ -15,3 +15,35 @@
     "Write": 9
   }
 }
+{
+  "timestamp": "2026-06-16T21:19:21Z",
+  "session_id": "a401b75c-1e8e-401a-a0b8-3a40c2c8419d",
+  "input_tokens": 33593,
+  "output_tokens": 103591,
+  "cache_read_tokens": 8835442,
+  "cache_creation_tokens": 489784,
+  "tools_used_summary": {
+    "AskUserQuestion": 2,
+    "Skill": 3,
+    "Workflow": 1,
+    "Bash": 23,
+    "Read": 9,
+    "Edit": 10,
+    "Write": 9,
+    "Agent": 1
+  }
+}
+{
+  "timestamp": "2026-06-17T00:47:01Z",
+  "session_id": "e69e9202-b7b2-49fc-8061-8bfced198707",
+  "input_tokens": 38602,
+  "output_tokens": 65697,
+  "cache_read_tokens": 4993334,
+  "cache_creation_tokens": 417551,
+  "tools_used_summary": {
+    "Bash": 24,
+    "Read": 5,
+    "ToolSearch": 1,
+    "Edit": 7
+  }
+}
