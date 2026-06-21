@@ -31,3 +31,30 @@ SessionEnd hook backstops this if you forget.
 - Optionally auto-advance: `/fetch-paper` + `/ingest` the load-bearing arXiv
   sources (2603.26512, 2505.19713, 2605.17448v2, 2605.28579, …) — check
   coordinator headroom first (agency: max).
+
+## 2026-06-21
+
+### Did
+- Implemented the snap-fit-enclosure trial via `/implement` (opus subagent):
+  build123d two-part enclosure, closed verify-revise loop, **all 8 gates pass
+  in 4 cycles**. Strength = closed-form cantilever (CalculiX absent — FEA stays
+  in agentic-solid-mechanics by decision).
+- Built the **human QA pipeline** (ADR `docs/decisions/0001-human-qa-strategy.md`):
+  - `docs/qa.html` — three.js STL viewer + gate metrics + dimensions + STEP/STL
+    downloads; context-aware (GitHub Pages → raw.githubusercontent; aiserver →
+    live working tree). No-slug shows an experiment chooser.
+  - `tools/qa_serve.py` + systemd `--user` unit `agentic-3d-qa.service` on
+    **port 8091** — live viewer at `http://aiserver2026:8091/` (LAN + Tailscale).
+  - `tools/step_to_stl.py` — mesh STEP→STL for the web viewer.
+  - `docs/index.html` nav gains a "3D / QA viewer" link.
+
+### Findings
+- Desktop `desktop-2020` (Windows) is LAN + Tailscale-direct to `aiserver2026`,
+  so live serving + GitHub Pages mirror both work; bandwidth is a non-issue.
+- Web QA = visual (STL, no WASM); precise measurement pushed to desktop CAD.
+
+### Next
+- On `desktop-2020`: install OrcaSlicer + FreeCAD (winget commands provided) and
+  smoke-test the live viewer + a STEP download.
+- Fold `step_to_stl.py` into the experiment harness so new designs auto-mesh.
+- Consider generalizing `qa.html`'s metrics schema as experiments diverge.

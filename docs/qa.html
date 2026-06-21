@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QA sheet · agentic-3d-design</title>
+<!--
+  Per-design QA sheet for human review. Interactive STL viewer (three.js) +
+  gate metrics + key dimensions + downloads. Context-aware file source:
+    - on *.github.io  -> raw.githubusercontent.com/<owner>/<repo>/<branch>/...
+    - served elsewhere (aiserver qa_serve.py) -> /experiments/<slug>/results/...
+  Usage: qa.html?slug=2026-06-16-snap-fit-enclosure
+  Local/test overrides: &owner=&repo=&branch=&base=
+-->
+<style>
+  :root { --bg:#0f1115; --panel:#171a21; --line:#262b36; --fg:#e6e9ef; --mut:#9aa3b2; --ok:#3fb950; --bad:#f85149; --accent:#58a6ff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--fg); }
+  header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  header .slug { color:var(--mut); font-family:ui-monospace,monospace; }
+  .badge { padding:2px 10px; border-radius:999px; font-weight:600; font-size:12px; }
+  .badge.pass { background:rgba(63,185,80,.15); color:var(--ok); border:1px solid var(--ok); }
+  .badge.fail { background:rgba(248,81,73,.15); color:var(--bad); border:1px solid var(--bad); }
+  main { display:grid; grid-template-columns: 1fr 360px; gap:0; height:calc(100vh - 52px); }
+  #stage { position:relative; background:#0b0d11; }
+  #canvasWrap { position:absolute; inset:0; }
+  #modelBar { position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap; z-index:5; }
+  #modelBar button { background:var(--panel); color:var(--fg); border:1px solid var(--line); padding:5px 11px; border-radius:6px; cursor:pointer; font-size:12px; }
+  #modelBar button.active { border-color:var(--accent); color:var(--accent); }
+  #hint { position:absolute; bottom:10px; left:10px; color:var(--mut); font-size:11px; z-index:5; }
+  aside { border-left:1px solid var(--line); overflow:auto; padding:16px; background:var(--panel); }
+  aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--mut); margin:18px 0 8px; }
+  aside h2:first-child { margin-top:0; }
+  table { width:100%; border-collapse:collapse; }
+  td { padding:3px 0; vertical-align:top; }
+  td.k { color:var(--mut); }
+  td.v { text-align:right; font-family:ui-monospace,monospace; }
+  .g-ok { color:var(--ok); } .g-bad { color:var(--bad); }
+  .note { background:rgba(88,166,255,.08); border:1px solid #1f3550; border-radius:6px; padding:8px 10px; color:var(--mut); font-size:12.5px; }
+  .warn { background:rgba(210,153,34,.10); border:1px solid #5a4a1f; color:#d9b25a; }
+  a.dl { display:inline-block; margin:2px 6px 2px 0; padding:3px 8px; border:1px solid var(--line); border-radius:5px; color:var(--accent); text-decoration:none; font-size:12px; }
+  a.dl:hover { border-color:var(--accent); }
+  img.render { width:100%; border:1px solid var(--line); border-radius:6px; margin-top:6px; background:#fff; }
+  .err { color:var(--bad); padding:20px; }
+  #fileErr { color:var(--bad); font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>QA sheet</h1>
+  <span class="slug" id="slug">…</span>
+  <span id="statusBadge"></span>
+  <span id="fileErr"></span>
+  <span style="flex:1"></span>
+  <a class="dl" id="repoLink" href="#" target="_blank" rel="noopener">repo ↗</a>
+</header>
+<main>
+  <section id="stage">
+    <div id="canvasWrap"></div>
+    <div id="modelBar"></div>
+    <div id="hint">drag = rotate · scroll = zoom · right-drag = pan</div>
+  </section>
+  <aside id="panel"><p style="color:var(--mut)">Loading metrics…</p></aside>
+</main>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { STLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const q = new URLSearchParams(location.search);
+const slug = q.get('slug');
+const branch = q.get('branch') || 'main';
+
+function fileBase() {
+  if (q.get('base')) return q.get('base');
+  let owner = q.get('owner'), repo = q.get('repo');
+  if ((!owner || !repo) && location.hostname.endsWith('github.io')) {
+    owner = owner || location.hostname.split('.')[0];
+    repo = repo || location.pathname.split('/').filter(Boolean)[0];
+  }
+  if (owner && repo) {
+    document.getElementById('repoLink').href = `https://github.com/${owner}/${repo}/tree/${branch}/experiments/${slug}`;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/experiments/${slug}/results/`;
+  }
+  // served from repo root by the aiserver qa_serve.py
+  document.getElementById('repoLink').href = `/experiments/${slug}/`;
+  return `/experiments/${slug}/results/`;
+}
+const BASE = slug ? fileBase() : null;
+document.getElementById('slug').textContent = slug || '(no ?slug= given)';
+
+// Candidate models (skipped gracefully if a file is missing).
+const MODELS = [
+  { key:'exploded', label:'Exploded', file:'assembled_exploded.stl' },
+  { key:'closed',   label:'Assembled', file:'assembled_closed.stl' },
+  { key:'box',      label:'Box',      file:'box.stl' },
+  { key:'lid',      label:'Lid',      file:'lid.stl' },
+];
+
+// ---- three.js scene ----
+const wrap = document.getElementById('canvasWrap');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0d11);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(window.devicePixelRatio);
+wrap.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(1,1.4,1); scene.add(key);
+const fill = new THREE.DirectionalLight(0xffffff, 0.4); fill.position.set(-1,-0.5,-1); scene.add(fill);
+let grid = new THREE.GridHelper(200, 20, 0x303642, 0x20242e); scene.add(grid);
+const loader = new STLLoader();
+const material = new THREE.MeshStandardMaterial({ color:0x9bb4d4, metalness:0.1, roughness:0.6, flatShading:false });
+let currentMesh = null;
+
+function resize() {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+
+function frameObject(obj) {
+  const box = new THREE.Box3().setFromObject(obj);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z) || 10;
+  controls.target.copy(center);
+  const dist = maxDim * 2.2;
+  camera.position.set(center.x + dist*0.8, center.y + dist*0.7, center.z + dist*0.9);
+  camera.near = maxDim/100; camera.far = maxDim*100; camera.updateProjectionMatrix();
+  grid.position.set(center.x, box.min.y, center.z);
+  controls.update();
+}
+
+const setFileErr = (t) => { const e = document.getElementById('fileErr'); if (e) e.textContent = t; };
+function loadModel(file) {
+  setFileErr('');
+  loader.load(BASE + file, (geo) => {
+    if (currentMesh) { scene.remove(currentMesh); currentMesh.geometry.dispose(); }
+    geo.computeVertexNormals();
+    currentMesh = new THREE.Mesh(geo, material);
+    // STL is Z-up (CAD); three.js is Y-up — rotate so it stands naturally.
+    currentMesh.rotation.x = -Math.PI/2;
+    scene.add(currentMesh);
+    frameObject(currentMesh);
+  }, undefined, () => {
+    setFileErr(`could not load ${file}`);
+  });
+}
+
+(function animate(){ requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); })();
+resize();
+
+// ---- model switch buttons (only for files that exist) ----
+async function buildModelBar() {
+  const bar = document.getElementById('modelBar');
+  let first = null;
+  for (const m of MODELS) {
+    let ok = true;
+    try { const r = await fetch(BASE + m.file, { method:'HEAD' }); ok = r.ok; } catch { ok = false; }
+    if (!ok) continue;
+    const b = document.createElement('button'); b.textContent = m.label;
+    b.onclick = () => { [...bar.children].forEach(c=>c.classList.remove('active')); b.classList.add('active'); loadModel(m.file); };
+    bar.appendChild(b);
+    if (!first) { first = b; }
+  }
+  if (first) first.click();
+  else document.getElementById('canvasWrap').innerHTML = '<p class="err">No STL models found for this design.</p>';
+}
+
+// ---- metrics panel ----
+const num = (x, d=2) => (typeof x === 'number' ? x.toFixed(d).replace(/\.?0+$/,'') : x);
+function row(k, v, cls='') { return `<tr><td class="k">${k}</td><td class="v ${cls}">${v}</td></tr>`; }
+
+async function loadPanel() {
+  const panel = document.getElementById('panel');
+  let m;
+  try { m = await (await fetch(BASE + '../metrics.json')).json(); }
+  catch { panel.innerHTML = '<p class="err">metrics.json not found.</p>'; return; }
+
+  const pass = m.all_gates_pass;
+  const badge = document.getElementById('statusBadge');
+  badge.className = 'badge ' + (pass ? 'pass' : 'fail');
+  badge.textContent = pass ? 'ALL GATES PASS' : 'GATES FAILING';
+
+  const gr = m.gate_results || {};
+  const gateRows = Object.entries(gr).map(([k,v]) =>
+    row(k, v ? '✓' : '✗', v ? 'g-ok' : 'g-bad')).join('');
+
+  const fn = m.final_numbers || {};
+  const dimRows = [
+    ['clearance (mm)', fn.clearance_radial_mm],
+    ['min wall (mm)', fn.min_wall_mm],
+    ['max overhang (°)', fn.max_overhang_deg],
+    ['interference (mm³)', fn.interference_volume_mm3],
+    ['snap hook depth (mm)', fn.snap_hook_depth_mm],
+    ['snap peak strain', fn.snap_peak_strain],
+    ['strain margin', fn.strain_margin],
+  ].filter(([,v]) => v !== undefined).map(([k,v]) => row(k, num(v,3))).join('');
+
+  const fp = m.final_params || {};
+  const sizeRows = ['outer_L','outer_W','outer_H','wall_t']
+    .filter(k => fp[k] !== undefined).map(k => row(k, num(fp[k]))).join('');
+
+  const proc = m.process || {};
+  const strengthWarn = (m.strength_method && m.strength_method !== 'fea')
+    ? `<div class="note warn" style="margin-top:8px"><b>Strength = ${m.strength_method}</b>. ${m.strength_note || 'Not a full FEA run — screen only.'}</div>` : '';
+
+  const dl = (f, label) => `<a class="dl" href="${BASE+f}" download>${label}</a>`;
+  const downloads = [
+    dl('box.step','box.step'), dl('lid.step','lid.step'),
+    dl('assembled_closed.step','assembled.step'), dl('assembled_exploded.step','exploded.step'),
+    dl('box.stl','box.stl'), dl('lid.stl','lid.stl'),
+  ].join('');
+
+  panel.innerHTML = `
+    <h2>Gates</h2><table>${gateRows}</table>
+    <h2>Key dimensions</h2><table>${dimRows}</table>
+    ${strengthWarn}
+    <h2>Outer size (mm)</h2><table>${sizeRows}</table>
+    <h2>Loop</h2><table>
+      ${row('cycles to all-pass', proc.n_revise_cycles ?? m.cycles_to_first_all_pass ?? '—')}
+      ${row('failures caught', proc.failures_caught_by_loop ?? '—')}
+      ${row('left to human', proc.failures_left_to_human ?? '—')}
+      ${row('seed', m.seed ?? '—')}
+    </table>
+    <h2>Downloads (for FreeCAD / OrcaSlicer)</h2>
+    <div class="note">STEP = exact B-rep for measuring &amp; slicing. STL = mesh.</div>
+    <div style="margin-top:6px">${downloads}</div>
+    <h2>Reference render</h2>
+    <img class="render" src="${BASE}three_view.png" alt="three-view render" onerror="this.style.display='none'">
+  `;
+}
+
+async function showChooser() {
+  const panel = document.getElementById('panel');
+  document.querySelector('#stage').innerHTML =
+    '<div style="padding:24px;color:#9aa3b2">Pick a design from the list →</div>';
+  document.getElementById('slug').textContent = '— choose a design —';
+  let owner = q.get('owner'), repo = q.get('repo');
+  if ((!owner || !repo) && location.hostname.endsWith('github.io')) {
+    owner = owner || location.hostname.split('.')[0];
+    repo = repo || location.pathname.split('/').filter(Boolean)[0];
+  }
+  if (!owner || !repo) {
+    panel.innerHTML = '<p class="err">Add <code>?slug=&lt;experiment&gt;</code> to the URL.</p>';
+    return;
+  }
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/experiments?ref=${branch}`);
+    const items = await r.json();
+    const slugs = (Array.isArray(items) ? items : [])
+      .filter(it => it.type === 'dir' && /^\d{4}-\d{2}-\d{2}-/.test(it.name))
+      .map(it => it.name).sort().reverse();
+    panel.innerHTML = '<h2>Designs</h2>' + (slugs.length
+      ? slugs.map(s => `<div style="margin:4px 0"><a class="dl" href="?slug=${encodeURIComponent(s)}">${s}</a></div>`).join('')
+      : '<p style="color:#9aa3b2">No experiments found.</p>');
+  } catch {
+    panel.innerHTML = '<p class="err">Could not list experiments.</p>';
+  }
+}
+
+if (!slug) {
+  showChooser();
+} else {
+  buildModelBar();
+  loadPanel();
+}
+</script>
+</body>
+</html>
