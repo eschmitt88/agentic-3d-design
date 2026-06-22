@@ -45,6 +45,23 @@
   .err { color:var(--bad); padding:20px; }
   #fileErr { color:var(--bad); font-size:12px; }
 </style>
+<!-- Map the bare 'three' specifier (used internally by STLLoader/OrbitControls)
+     to the locally vendored build — no CDN dependency, works offline/on-LAN. -->
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js" } }
+</script>
+<script>
+  // Turn a silent blank screen into an actionable message if a script/module
+  // fails to load (e.g. vendored three.js missing).
+  window.addEventListener('error', function (e) {
+    var t = e && e.target;
+    if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) {
+      var p = document.getElementById('panel');
+      if (p) p.innerHTML = '<p class="err">Failed to load ' + (t.src || t.href) +
+        '. The 3D viewer libs may be missing under docs/vendor/three/.</p>';
+    }
+  }, true);
+</script>
 </head>
 <body>
 <header>
@@ -65,9 +82,9 @@
 </main>
 
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { STLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { STLLoader } from './vendor/three/STLLoader.js';
+import { OrbitControls } from './vendor/three/OrbitControls.js';
 
 const q = new URLSearchParams(location.search);
 const slug = q.get('slug');
