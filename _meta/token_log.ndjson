@@ -47,3 +47,21 @@
     "Edit": 7
   }
 }
+{
+  "timestamp": "2026-06-21T04:22:56Z",
+  "session_id": "a401b75c-1e8e-401a-a0b8-3a40c2c8419d",
+  "input_tokens": 37946,
+  "output_tokens": 241025,
+  "cache_read_tokens": 20027068,
+  "cache_creation_tokens": 1663664,
+  "tools_used_summary": {
+    "AskUserQuestion": 3,
+    "Skill": 3,
+    "Workflow": 1,
+    "Bash": 39,
+    "Read": 11,
+    "Edit": 21,
+    "Write": 15,
+    "Agent": 1
+  }
+}
