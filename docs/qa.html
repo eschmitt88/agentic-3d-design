@@ -25,9 +25,14 @@
   main { display:grid; grid-template-columns: 1fr 360px; gap:0; height:calc(100vh - 52px); }
   #stage { position:relative; background:#0b0d11; }
   #canvasWrap { position:absolute; inset:0; }
-  #modelBar { position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap; z-index:5; }
+  #modelBar { position:absolute; top:10px; left:10px; display:flex; gap:8px; flex-wrap:wrap; z-index:5; }
+  .ctlgroup { display:flex; gap:4px; align-items:center; background:rgba(15,17,21,.72); border:1px solid var(--line); border-radius:8px; padding:3px; }
   #modelBar button { background:var(--panel); color:var(--fg); border:1px solid var(--line); padding:5px 11px; border-radius:6px; cursor:pointer; font-size:12px; }
+  #modelBar button:hover { border-color:#3a4150; }
   #modelBar button.active { border-color:var(--accent); color:var(--accent); }
+  .swatch { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:middle; border:1px solid rgba(0,0,0,.3); }
+  .ctllab { color:var(--mut); font-size:12px; padding:0 6px; }
+  #modelBar input[type=range] { accent-color:var(--accent); width:92px; margin:0 6px; }
   #hint { position:absolute; bottom:10px; left:10px; color:var(--mut); font-size:11px; z-index:5; }
   aside { border-left:1px solid var(--line); overflow:auto; padding:16px; background:var(--panel); }
   aside h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--mut); margin:18px 0 8px; }
@@ -108,13 +113,13 @@ function fileBase() {
 const BASE = slug ? fileBase() : null;
 document.getElementById('slug').textContent = slug || '(no ?slug= given)';
 
-// Candidate models (skipped gracefully if a file is missing).
-const MODELS = [
-  { key:'exploded', label:'Exploded', file:'assembled_exploded.stl' },
-  { key:'closed',   label:'Assembled', file:'assembled_closed.stl' },
-  { key:'box',      label:'Box',      file:'box.stl' },
-  { key:'lid',      label:'Lid',      file:'lid.stl' },
+// Parts of the assembly — each loaded as its own colored mesh. Files that are
+// absent are skipped; if no per-part files exist we fall back to a single mesh.
+const PARTS = [
+  { key:'box', label:'Box', file:'box.stl', color:0x6f9ad6 },
+  { key:'lid', label:'Lid', file:'lid.stl', color:0xe0a458 },
 ];
+const FALLBACK = { key:'model', label:'Model', file:'assembled_closed.stl', color:0x9bb4d4 };
 
 // ---- three.js scene ----
 const wrap = document.getElementById('canvasWrap');
@@ -126,13 +131,17 @@ renderer.setPixelRatio(window.devicePixelRatio);
 wrap.appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(1,1.4,1); scene.add(key);
-const fill = new THREE.DirectionalLight(0xffffff, 0.4); fill.position.set(-1,-0.5,-1); scene.add(fill);
-let grid = new THREE.GridHelper(200, 20, 0x303642, 0x20242e); scene.add(grid);
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const keyLight = new THREE.DirectionalLight(0xffffff, 0.85); keyLight.position.set(1,1.4,1); scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xffffff, 0.35); fillLight.position.set(-1,-0.6,-1); scene.add(fillLight);
+const grid = new THREE.GridHelper(200, 20, 0x303642, 0x20242e); scene.add(grid);
+// CAD is Z-up; three.js is Y-up. Rotate the whole assembly once so +Z(model)→+Y(world).
+const assembly = new THREE.Group(); assembly.rotation.x = -Math.PI/2; scene.add(assembly);
 const loader = new STLLoader();
-const material = new THREE.MeshStandardMaterial({ color:0x9bb4d4, metalness:0.1, roughness:0.6, flatShading:false });
-let currentMesh = null;
+
+let parts = [];                                   // {key,label,color,mesh,edges,index}
+const view = { edges:false, wire:false, explode:0, isolate:null };
+let modelHeight = 50;                             // vertical (model-Z) extent, for explode scaling
 
 function resize() {
   const w = wrap.clientWidth, h = wrap.clientHeight;
@@ -142,6 +151,7 @@ window.addEventListener('resize', resize);
 
 function frameObject(obj) {
   const box = new THREE.Box3().setFromObject(obj);
+  if (box.isEmpty()) return;
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z) || 10;
@@ -153,40 +163,94 @@ function frameObject(obj) {
   controls.update();
 }
 
+function applyView() {
+  for (const p of parts) {
+    const visible = !view.isolate || view.isolate === p.key;
+    p.mesh.visible = visible;
+    p.mesh.material.wireframe = view.wire;
+    p.edges.visible = visible && view.edges && !view.wire;
+    // explode upward along model +Z, ordered bottom→top by part index
+    p.mesh.position.z = view.explode * modelHeight * 0.6 * p.index;
+  }
+}
+
 const setFileErr = (t) => { const e = document.getElementById('fileErr'); if (e) e.textContent = t; };
-function loadModel(file) {
+
+function addPart(def, geo) {
+  geo.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ color:def.color, metalness:0.1, roughness:0.55 });
+  const mesh = new THREE.Mesh(geo, mat);
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30),
+    new THREE.LineBasicMaterial({ color:0x0c1016 }));
+  edges.visible = false;
+  mesh.add(edges);
+  assembly.add(mesh);
+  geo.computeBoundingBox();
+  const cz = geo.boundingBox.getCenter(new THREE.Vector3()).z;   // model-Z centre, for ordering
+  parts.push({ ...def, mesh, edges, cz, index:0 });
+}
+
+async function loadParts() {
   setFileErr('');
-  loader.load(BASE + file, (geo) => {
-    if (currentMesh) { scene.remove(currentMesh); currentMesh.geometry.dispose(); }
-    geo.computeVertexNormals();
-    currentMesh = new THREE.Mesh(geo, material);
-    // STL is Z-up (CAD); three.js is Y-up — rotate so it stands naturally.
-    currentMesh.rotation.x = -Math.PI/2;
-    scene.add(currentMesh);
-    frameObject(currentMesh);
-  }, undefined, () => {
-    setFileErr(`could not load ${file}`);
-  });
+  const present = [];
+  for (const def of PARTS) {
+    try { const r = await fetch(BASE + def.file, { method:'HEAD' }); if (r.ok) present.push(def); } catch {}
+  }
+  const defs = present.length ? present : [FALLBACK];
+  await Promise.all(defs.map(def => new Promise(res => {
+    loader.load(BASE + def.file, (geo) => { addPart(def, geo); res(); },
+      undefined, () => { setFileErr(`could not load ${def.file}`); res(); });
+  })));
+  if (!parts.length) {
+    document.getElementById('canvasWrap').insertAdjacentHTML('beforeend',
+      '<p class="err" style="position:absolute;top:50%;left:0;right:0;text-align:center">No STL models found.</p>');
+    return;
+  }
+  parts.sort((a,b) => a.cz - b.cz);          // bottom→top
+  parts.forEach((p,i) => { p.index = i; });
+  modelHeight = new THREE.Box3().setFromObject(assembly).getSize(new THREE.Vector3()).y || 50;
+  applyView();
+  frameObject(assembly);
+  buildControls();
 }
 
 (function animate(){ requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); })();
 resize();
 
-// ---- model switch buttons (only for files that exist) ----
-async function buildModelBar() {
+// ---- viewer controls (part isolation + edges/wireframe + explode) ----
+function buildControls() {
   const bar = document.getElementById('modelBar');
-  let first = null;
-  for (const m of MODELS) {
-    let ok = true;
-    try { const r = await fetch(BASE + m.file, { method:'HEAD' }); ok = r.ok; } catch { ok = false; }
-    if (!ok) continue;
-    const b = document.createElement('button'); b.textContent = m.label;
-    b.onclick = () => { [...bar.children].forEach(c=>c.classList.remove('active')); b.classList.add('active'); loadModel(m.file); };
-    bar.appendChild(b);
-    if (!first) { first = b; }
+  bar.innerHTML = '';
+  const swatch = (c) => `<span class="swatch" style="background:#${c.toString(16).padStart(6,'0')}"></span>`;
+  const mkBtn = (html, active, fn) => {
+    const b = document.createElement('button'); b.innerHTML = html;
+    if (active) b.classList.add('active');
+    b.onclick = () => fn(b); return b;
+  };
+  const grp = (kids) => { const d = document.createElement('div'); d.className = 'ctlgroup'; kids.forEach(k => d.appendChild(k)); return d; };
+
+  // part isolation (+ colour legend via swatches)
+  if (parts.length > 1) {
+    const viewBtns = [];
+    const setIsolate = (key, btn) => { view.isolate = key; viewBtns.forEach(x => x.classList.remove('active')); btn.classList.add('active'); applyView(); };
+    const allBtn = mkBtn('Assembly', true, b => setIsolate(null, b)); viewBtns.push(allBtn);
+    const partBtns = parts.map(p => { const b = mkBtn(swatch(p.color)+p.label, false, bb => setIsolate(p.key, bb)); viewBtns.push(b); return b; });
+    bar.appendChild(grp([allBtn, ...partBtns]));
   }
-  if (first) first.click();
-  else document.getElementById('canvasWrap').innerHTML = '<p class="err">No STL models found for this design.</p>';
+
+  // edges / wireframe toggles
+  const edgesBtn = mkBtn('Edges', false, b => { view.edges = !view.edges; b.classList.toggle('active', view.edges); applyView(); });
+  const wireBtn = mkBtn('Wireframe', false, b => { view.wire = !view.wire; b.classList.toggle('active', view.wire); applyView(); });
+  bar.appendChild(grp([edgesBtn, wireBtn]));
+
+  // explode slider (only meaningful for multi-part)
+  if (parts.length > 1) {
+    const g = document.createElement('div'); g.className = 'ctlgroup';
+    const lab = document.createElement('span'); lab.className = 'ctllab'; lab.textContent = 'Explode';
+    const sl = document.createElement('input'); sl.type = 'range'; sl.min = '0'; sl.max = '1'; sl.step = '0.01'; sl.value = '0';
+    sl.oninput = () => { view.explode = parseFloat(sl.value); applyView(); };
+    g.appendChild(lab); g.appendChild(sl); bar.appendChild(g);
+  }
 }
 
 // ---- metrics panel ----
@@ -284,7 +348,7 @@ async function showChooser() {
 if (!slug) {
   showChooser();
 } else {
-  buildModelBar();
+  loadParts();
   loadPanel();
 }
 </script>
