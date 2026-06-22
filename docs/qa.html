@@ -46,6 +46,18 @@
   .warn { background:rgba(210,153,34,.10); border:1px solid #5a4a1f; color:#d9b25a; }
   a.dl { display:inline-block; margin:2px 6px 2px 0; padding:3px 8px; border:1px solid var(--line); border-radius:5px; color:var(--accent); text-decoration:none; font-size:12px; }
   a.dl:hover { border-color:var(--accent); }
+  table.dlt { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.dlt th { color:var(--mut); font-size:11px; font-weight:600; text-align:right; padding:2px 0; }
+  table.dlt th:first-child { text-align:left; }
+  table.dlt td { padding:3px 0; }
+  table.dlt td.lab { color:var(--fg); }
+  table.dlt td.c { text-align:right; width:54px; }
+  table.dlt tr.grp td { color:var(--mut); text-transform:uppercase; letter-spacing:.05em; font-size:11px; padding:10px 0 3px; border-bottom:1px solid var(--line); }
+  a.dlc { display:inline-block; min-width:30px; text-align:center; padding:2px 8px; border:1px solid var(--line); border-radius:5px; color:var(--accent); text-decoration:none; font-size:12px; }
+  a.dlc.wide { min-width:auto; margin:2px 6px 0 0; }
+  a.dlc:hover { border-color:var(--accent); }
+  .dimc { color:#3a4150; }
+  .dlextra { margin-top:8px; }
   img.render { width:100%; border:1px solid var(--line); border-radius:6px; margin-top:6px; background:#fff; }
   .err { color:var(--bad); padding:20px; }
   #fileErr { color:var(--bad); font-size:12px; }
@@ -291,12 +303,36 @@ async function loadPanel() {
   const strengthWarn = (m.strength_method && m.strength_method !== 'fea')
     ? `<div class="note warn" style="margin-top:8px"><b>Strength = ${m.strength_method}</b>. ${m.strength_note || 'Not a full FEA run — screen only.'}</div>` : '';
 
-  const dl = (f, label) => `<a class="dl" href="${BASE+f}" download>${label}</a>`;
-  const downloads = [
-    dl('box.step','box.step'), dl('lid.step','lid.step'),
-    dl('assembled_closed.step','assembled.step'), dl('assembled_exploded.step','exploded.step'),
-    dl('box.stl','box.stl'), dl('lid.stl','lid.stl'),
-  ].join('');
+  // ---- downloads: grouped (Parts / Assembly), STEP|STL columns, only files that exist ----
+  const DL_GROUPS = [
+    { title:'Parts', rows:[
+      { label:'Box', step:'box.step', stl:'box.stl' },
+      { label:'Lid', step:'lid.step', stl:'lid.stl' },
+    ]},
+    { title:'Assembly', rows:[
+      { label:'Closed',   step:'assembled_closed.step',   stl:'assembled_closed.stl' },
+      { label:'Exploded', step:'assembled_exploded.step', stl:'assembled_exploded.stl' },
+    ]},
+  ];
+  const dlFiles = DL_GROUPS.flatMap(g => g.rows.flatMap(r => [r.step, r.stl])).concat('three_view.png');
+  const have = {};
+  await Promise.all(dlFiles.map(async f => {
+    try { const r = await fetch(BASE + f, { method:'HEAD' }); have[f] = r.ok; } catch { have[f] = false; }
+  }));
+  const cell = (f) => have[f] ? `<a class="dlc" href="${BASE+f}" download title="${f}">↓</a>` : '<span class="dimc">—</span>';
+  const dlBody = DL_GROUPS.map(g => {
+    const rows = g.rows.filter(r => have[r.step] || have[r.stl]);
+    if (!rows.length) return '';
+    return `<tr class="grp"><td colspan="3">${g.title}</td></tr>` + rows.map(r =>
+      `<tr><td class="lab">${r.label}</td><td class="c">${cell(r.step)}</td><td class="c">${cell(r.stl)}</td></tr>`).join('');
+  }).join('');
+  const metricsURL = BASE.replace(/results\/?$/, '') + 'metrics.json';
+  const extras = [
+    have['three_view.png'] ? `<a class="dlc wide" href="${BASE}three_view.png" download>render.png</a>` : '',
+    `<a class="dlc wide" href="${metricsURL}" download>metrics.json</a>`,
+  ].filter(Boolean).join('');
+  const downloads = `<table class="dlt"><thead><tr><th></th><th>STEP</th><th>STL</th></tr></thead>` +
+    `<tbody>${dlBody}</tbody></table><div class="dlextra">${extras}</div>`;
 
   panel.innerHTML = `
     <h2>Gates</h2><table>${gateRows}</table>
@@ -309,9 +345,9 @@ async function loadPanel() {
       ${row('left to human', proc.failures_left_to_human ?? '—')}
       ${row('seed', m.seed ?? '—')}
     </table>
-    <h2>Downloads (for FreeCAD / OrcaSlicer)</h2>
-    <div class="note">STEP = exact B-rep for measuring &amp; slicing. STL = mesh.</div>
-    <div style="margin-top:6px">${downloads}</div>
+    <h2>Downloads</h2>
+    <div class="note">STEP = exact B-rep — measure in FreeCAD, slice in OrcaSlicer. STL = mesh.</div>
+    ${downloads}
     <h2>Reference render</h2>
     <img class="render" src="${BASE}three_view.png" alt="three-view render" onerror="this.style.display='none'">
   `;

@@ -101,3 +101,21 @@
     "Agent": 1
   }
 }
+{
+  "timestamp": "2026-06-22T03:23:50Z",
+  "session_id": "a401b75c-1e8e-401a-a0b8-3a40c2c8419d",
+  "input_tokens": 39598,
+  "output_tokens": 347831,
+  "cache_read_tokens": 29927670,
+  "cache_creation_tokens": 2267638,
+  "tools_used_summary": {
+    "AskUserQuestion": 3,
+    "Skill": 3,
+    "Workflow": 1,
+    "Bash": 50,
+    "Read": 12,
+    "Edit": 27,
+    "Write": 15,
+    "Agent": 1
+  }
+}
