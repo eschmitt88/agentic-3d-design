@@ -54,6 +54,15 @@ STEP carries exact B-rep + assembly transforms — what FreeCAD/OrcaSlicer want
 for measuring and slicing. `tools/step_to_stl.py` meshes STEP→STL for the
 viewer; the agent runs it after each design.
 
+## three.js is vendored, not CDN-loaded
+
+The aiserver could not reliably reach `cdn.jsdelivr.net` (likely the AdGuard/edge
+DNS in the home-netsec setup), so the viewer's three.js (core + STLLoader +
+OrbitControls) is **vendored under `docs/vendor/three/`** and loaded via an
+import map (`"three"` → the local build). No CDN dependency — works on-LAN,
+offline, and on Pages. A `window.error` handler surfaces any missing-lib failure
+instead of rendering a blank screen.
+
 ## Network rationale
 
 Desktop is LAN + Tailscale-direct, so bandwidth is a non-issue and a stable
