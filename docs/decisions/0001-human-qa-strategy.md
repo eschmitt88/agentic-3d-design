@@ -39,9 +39,9 @@ A three-layer QA pipeline, agent-does-the-work first:
 
 ### Hosting — both paths
 
-- **Live:** `tools/qa_serve.py` (stdlib HTTP, port **8091**) run by a systemd
-  `--user` unit `agentic-3d-qa.service`. Reachable at `http://aiserver2026:8091/`
-  (Tailscale MagicDNS — fast on-LAN, still works remote) and `http://192.168.50.46:8091/`.
+- **Live:** `tools/qa_serve.py` (stdlib HTTP, port **8101**) run by a systemd
+  `--user` unit `agentic-3d-qa.service`. Reachable at `http://aiserver2026:8101/`
+  (Tailscale MagicDNS — fast on-LAN, still works remote) and `http://192.168.50.46:8101/`.
   Bound to the LAN/tailnet only; **not** port-forwarded to the public internet.
 - **Durable/remote:** the same `docs/qa.html` on GitHub Pages
   (`https://eschmitt88.github.io/agentic-3d-design/qa.html`), reading committed

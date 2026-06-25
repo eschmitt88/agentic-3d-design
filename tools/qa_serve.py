@@ -10,11 +10,11 @@ uncommitted iterations the GitHub Pages mirror can't see yet.
   - `/experiments/<slug>/results/*.stl|*.step|metrics.json` -> raw files
 
 Binds 0.0.0.0 so it's reachable on the LAN (192.168.50.46) and over the
-Tailscale mesh (http://aiserver2026:8091). Private tailnet + LAN only — do
+Tailscale mesh (http://aiserver2026:8101). Private tailnet + LAN only — do
 not port-forward to the public internet (not needed; repo is on GitHub Pages
 for remote/durable access).
 
-Stdlib only — no venv required:  python3 tools/qa_serve.py [--port 8091]
+Stdlib only — no venv required:  python3 tools/qa_serve.py [--port 8101]
 """
 from __future__ import annotations
 
@@ -118,7 +118,7 @@ class Handler(SimpleHTTPRequestHandler):
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", type=int, default=8091)
+    ap.add_argument("--port", type=int, default=8101)
     ap.add_argument("--host", default="0.0.0.0")
     args = ap.parse_args()
     handler = partial(Handler, directory=str(ROOT))

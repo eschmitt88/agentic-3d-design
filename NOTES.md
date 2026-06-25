@@ -44,7 +44,7 @@ SessionEnd hook backstops this if you forget.
     downloads; context-aware (GitHub Pages → raw.githubusercontent; aiserver →
     live working tree). No-slug shows an experiment chooser.
   - `tools/qa_serve.py` + systemd `--user` unit `agentic-3d-qa.service` on
-    **port 8091** — live viewer at `http://aiserver2026:8091/` (LAN + Tailscale).
+    **port 8101** — live viewer at `http://aiserver2026:8101/` (LAN + Tailscale).
   - `tools/step_to_stl.py` — mesh STEP→STL for the web viewer.
   - `docs/index.html` nav gains a "3D / QA viewer" link.
 
