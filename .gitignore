@@ -28,3 +28,7 @@ __pycache__/
 *.tar
 *.tar.gz
 *.zip
+
+# Hook telemetry — appended by the Stop hook after every turn, so it can
+# never stay committed-clean. Durable copy lives in ~/.claude/state.db.
+_meta/token_log.ndjson
