@@ -6,9 +6,9 @@
 
 ## Context
 
-Designs are produced on the headless aiserver (`<build-server>`, Linux). The
-human reviewer works on a Windows daily driver (`<reviewer-desktop>`) that is on the
-same LAN (<LAN-subnet>) **and** the Tailscale mesh (direct connection). We
+Designs are produced on a headless Linux build server. The human reviewer
+works on a Windows daily driver that is on the same LAN **and** the
+Tailscale mesh (direct connection). We
 need the reviewer to open and validate multi-part 3D files (STEP/STL) easily,
 with as little manual effort as possible. FEA-based strength validation is
 explicitly **out of scope here** — it lives in the sibling `agentic-solid-mechanics`
@@ -27,12 +27,12 @@ A three-layer QA pipeline, agent-does-the-work first:
 2. **Browser viewer, zero install.** `docs/qa.html` is context-aware:
    - On GitHub Pages it loads models from `raw.githubusercontent.com` (works
      anywhere with internet; committed designs only).
-   - Served by the aiserver it loads from the live working tree (shows
+   - Served by the build server it loads from the live working tree (shows
      in-progress, uncommitted iterations).
    Interactive web view uses **STL** (no WASM dependency); STEP is offered as a
    download for desktop CAD.
 
-3. **Two free desktop tools on `<reviewer-desktop>`, for deep QA.**
+3. **Two free desktop tools on the reviewer's workstation, for deep QA.**
    - **OrcaSlicer** — printability view (orientation, overhangs, supports,
      time/material), matches the print-outsourcing goal.
    - **FreeCAD** — precise measurement (clearances, walls), section/exploded.
@@ -41,11 +41,11 @@ A three-layer QA pipeline, agent-does-the-work first:
 
 - **Live:** `tools/qa_serve.py` (stdlib HTTP, port **8101**) run by a systemd
   `--user` unit `agentic-3d-qa.service`. Reachable at `http://<build-server>:8101/`
-  (Tailscale MagicDNS — fast on-LAN, still works remote) and `http://<LAN-IP>:8101/`.
+  by MagicDNS hostname (fast on-LAN, still works remote) or LAN IP.
   Bound to the LAN/tailnet only; **not** port-forwarded to the public internet.
 - **Durable/remote:** the same `docs/qa.html` on GitHub Pages
   (`https://eschmitt88.github.io/agentic-3d-design/qa.html`), reading committed
-  files. Survives the aiserver being off; works from anywhere.
+  files. Survives the build server being off; works from anywhere.
 
 ## Why STL for web, STEP for desktop
 
@@ -56,8 +56,8 @@ viewer; the agent runs it after each design.
 
 ## three.js is vendored, not CDN-loaded
 
-The aiserver could not reliably reach `cdn.jsdelivr.net` (likely the AdGuard/edge
-DNS in the <private-project> setup), so the viewer's three.js (core + STLLoader +
+The build server could not reliably reach `cdn.jsdelivr.net` (local DNS
+filtering), so the viewer's three.js (core + STLLoader +
 OrbitControls) is **vendored under `docs/vendor/three/`** and loaded via an
 import map (`"three"` → the local build). No CDN dependency — works on-LAN,
 offline, and on Pages. A `window.error` handler surfaces any missing-lib failure
@@ -66,9 +66,9 @@ instead of rendering a blank screen.
 ## Network rationale
 
 Desktop is LAN + Tailscale-direct, so bandwidth is a non-issue and a stable
-MagicDNS hostname (`<build-server>`) works on-LAN and remote transparently. The
-GitHub Pages mirror covers the desktop-is-offline-from-aiserver case (needs
-only internet).
+MagicDNS hostname works on-LAN and remote transparently. The GitHub Pages
+mirror covers the desktop-offline-from-build-server case (needs only
+internet).
 
 ## Consequences
 
