@@ -41,20 +41,20 @@ SessionEnd hook backstops this if you forget.
   in agentic-solid-mechanics by decision).
 - Built the **human QA pipeline** (ADR `docs/decisions/0001-human-qa-strategy.md`):
   - `docs/qa.html` — three.js STL viewer + gate metrics + dimensions + STEP/STL
-    downloads; context-aware (GitHub Pages → raw.githubusercontent; aiserver →
+    downloads; context-aware (GitHub Pages → raw.githubusercontent; build server →
     live working tree). No-slug shows an experiment chooser.
   - `tools/qa_serve.py` + systemd `--user` unit `agentic-3d-qa.service` on
-    **port 8101** — live viewer at `http://<build-server>:8101/` (LAN + Tailscale).
+    **port 8101** — live viewer on port 8101 (LAN + Tailscale).
   - `tools/step_to_stl.py` — mesh STEP→STL for the web viewer.
   - `docs/index.html` nav gains a "3D / QA viewer" link.
 
 ### Findings
-- Desktop `<reviewer-desktop>` (Windows) is LAN + Tailscale-direct to `<build-server>`,
+- The reviewer's Windows desktop is LAN + Tailscale-direct to the build server,
   so live serving + GitHub Pages mirror both work; bandwidth is a non-issue.
 - Web QA = visual (STL, no WASM); precise measurement pushed to desktop CAD.
 
 ### Next
-- On `<reviewer-desktop>`: install OrcaSlicer + FreeCAD (winget commands provided) and
+- On the reviewer desktop: install OrcaSlicer + FreeCAD (winget commands provided) and
   smoke-test the live viewer + a STEP download.
 - Fold `step_to_stl.py` into the experiment harness so new designs auto-mesh.
 - Consider generalizing `qa.html`'s metrics schema as experiments diverge.

@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 """Live QA server for agentic-3d-design.
 
-Serves the project working tree over HTTP so the Windows daily-driver
-(<reviewer-desktop>) can review designs in a browser — including in-progress,
-uncommitted iterations the GitHub Pages mirror can't see yet.
+Serves the project working tree over HTTP so the reviewer's workstation
+can review designs in a browser — including in-progress, uncommitted
+iterations the GitHub Pages mirror can't see yet.
 
   - `/`                      -> landing page listing experiments + QA links
   - `/docs/qa.html?slug=...` -> the interactive QA sheet (three.js viewer)
   - `/experiments/<slug>/results/*.stl|*.step|metrics.json` -> raw files
 
-Binds 0.0.0.0 so it's reachable on the LAN (<LAN-IP>) and over the
-Tailscale mesh (http://<build-server>:8101). Private tailnet + LAN only — do
-not port-forward to the public internet (not needed; repo is on GitHub Pages
-for remote/durable access).
+Binds 0.0.0.0 so it's reachable on the LAN and over the Tailscale mesh.
+Private tailnet + LAN only — do not port-forward to the public internet
+(not needed; repo is on GitHub Pages for remote/durable access).
 
 Stdlib only — no venv required:  python3 tools/qa_serve.py [--port 8101]
 """
@@ -22,6 +21,7 @@ import argparse
 import html
 import json
 import re
+import socket
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -90,7 +90,7 @@ def landing() -> bytes:
   .m {{ margin-top:4px; color:#9aa3b2; font-size:12px; }}
 </style></head><body>
 <header><h1>agentic-3d-design · QA</h1>
-<p>Live working tree on <build-server>. Click a design to review it. Open STEP files in FreeCAD / OrcaSlicer for measurement.</p></header>
+<p>Live working tree on the build server. Click a design to review it. Open STEP files in FreeCAD / OrcaSlicer for measurement.</p></header>
 <div class="wrap">{body}</div></body></html>""".encode("utf-8")
 
 
@@ -123,7 +123,7 @@ def main() -> int:
     args = ap.parse_args()
     handler = partial(Handler, directory=str(ROOT))
     srv = ThreadingHTTPServer((args.host, args.port), handler)
-    print(f"agentic-3d-design QA server → http://<build-server>:{args.port}/  (root={ROOT})")
+    print(f"agentic-3d-design QA server → http://{socket.gethostname()}:{args.port}/  (root={ROOT})")
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

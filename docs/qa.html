@@ -8,7 +8,7 @@
   Per-design QA sheet for human review. Interactive STL viewer (three.js) +
   gate metrics + key dimensions + downloads. Context-aware file source:
     - on *.github.io  -> raw.githubusercontent.com/<owner>/<repo>/<branch>/...
-    - served elsewhere (aiserver qa_serve.py) -> /experiments/<slug>/results/...
+    - served elsewhere (build-server qa_serve.py) -> /experiments/<slug>/results/...
   Usage: qa.html?slug=2026-06-16-snap-fit-enclosure
   Local/test overrides: &owner=&repo=&branch=&base=
 -->
@@ -118,7 +118,7 @@ function fileBase() {
     document.getElementById('repoLink').href = `https://github.com/${owner}/${repo}/tree/${branch}/experiments/${slug}`;
     return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/experiments/${slug}/results/`;
   }
-  // served from repo root by the aiserver qa_serve.py
+  // served from repo root by the build-server qa_serve.py
   document.getElementById('repoLink').href = `/experiments/${slug}/`;
   return `/experiments/${slug}/results/`;
 }
